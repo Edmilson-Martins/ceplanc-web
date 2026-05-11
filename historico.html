@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CEPLANC Web — Histórico</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .historico-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      /* CORREÇÃO: removido margin-bottom daqui — os filtros já têm o próprio
+         margin-bottom via .filtros no CSS global, evitando espaço duplo. */
+    }
+    .busca-wrapper { position: relative; }
+    .busca-wrapper input {
+      background: var(--fundo-card);
+      border: 1px solid var(--cinza-escuro);
+      border-radius: var(--radius);
+      color: var(--branco);
+      padding: 9px 14px 9px 36px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      width: 220px;
+      transition: var(--trans);
+    }
+    .busca-wrapper input:focus {
+      outline: none;
+      border-color: var(--azul-borda);
+      width: 280px;
+    }
+    .busca-wrapper .icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--cinza);
+      font-size: 15px;
+    }
+    .tabela-wrapper {
+      background: var(--fundo-card);
+      border: 1px solid var(--cinza-escuro);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .sem-resultado {
+      text-align: center;
+      padding: 48px 16px;
+      color: var(--cinza);
+      font-size: 14px;
+    }
+    .sem-resultado span { font-size: 32px; display: block; margin-bottom: 8px; }
+    .col-id     { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--azul-borda); font-weight: 600; }
+    .col-equipe { font-weight: 700; font-family: 'Rajdhani', sans-serif; font-size: 16px; letter-spacing: 1px; }
+    .col-data   { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--cinza); }
+    .resumo-bar { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+    .resumo-item {
+      background: var(--fundo-card);
+      border: 1px solid var(--cinza-escuro);
+      border-radius: var(--radius);
+      padding: 10px 16px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .resumo-item strong { font-family: 'Rajdhani', sans-serif; font-size: 18px; }
+
+    /* ── Accordion ── */
+    tbody tr.linha-principal { cursor: pointer; }
+    tbody tr.linha-principal:hover td { background: var(--fundo-hover); }
+    tbody tr.linha-principal.aberta td { background: rgba(57,73,171,0.08); }
+
+    .col-seta {
+      color: var(--cinza-escuro);
+      font-size: 11px;
+      transition: transform 0.2s ease;
+      user-select: none;
+      text-align: center;
+      width: 28px;
+    }
+    tr.aberta .col-seta { transform: rotate(90deg); color: var(--azul-borda); }
+
+    tr.linha-obs td {
+      padding: 0;
+      border-bottom: 1px solid var(--cinza-escuro);
+    }
+    .obs-conteudo {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.25s ease, padding 0.2s ease;
+      padding: 0 18px;
+      background: rgba(57,73,171,0.05);
+      font-size: 13px;
+      color: var(--cinza);
+      font-style: italic;
+    }
+    .obs-conteudo.visivel {
+      max-height: 120px;
+      padding: 12px 18px;
+    }
+    .obs-conteudo .obs-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--azul-borda);
+      font-style: normal;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .obs-vazia { color: var(--cinza-escuro); font-style: italic; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <span class="badge">⚖</span>
+    <span>CEPLANC Web</span>
+  </a>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="index.html">🏠 Fila</a></li>
+    <li><a href="equipes.html">👥 Equipes</a></li>
+    <li><a href="historico.html">📋 Histórico</a></li>
+    <li><a href="nova-ocorrencia.html" class="btn-nova">+ Nova</a></li>
+    <li><a href="sobre.html">ℹ Sobre</a></li>
+  </ul>
+  <span id="relogio"></span>
+</nav>
+
+<div id="toast-container"></div>
+
+<main>
+  <div class="page-header">
+    <h1>📋 Histórico de Ocorrências</h1>
+    <p>Registro completo de todos os flagrantes atendidos</p>
+  </div>
+
+  <div class="resumo-bar" id="resumo-bar"></div>
+
+  <div class="historico-header">
+    <div class="filtros" id="filtros">
+      <button class="filtro-btn ativo" data-equipe="TODAS"   onclick="filtrar('TODAS',   this)">Todas</button>
+      <button class="filtro-btn"       data-equipe="ALFA"    onclick="filtrar('ALFA',    this)">ALFA</button>
+      <button class="filtro-btn"       data-equipe="BRAVO"   onclick="filtrar('BRAVO',   this)">BRAVO</button>
+      <button class="filtro-btn"       data-equipe="CHARLIE" onclick="filtrar('CHARLIE', this)">CHARLIE</button>
+      <button class="filtro-btn"       data-equipe="DELTA"   onclick="filtrar('DELTA',   this)">DELTA</button>
+      <button class="filtro-btn"       data-equipe="ECHO"    onclick="filtrar('ECHO',    this)">ECHO</button>
+    </div>
+    <div class="busca-wrapper">
+      <span class="icon">🔍</span>
+      <input type="text" id="busca" placeholder="Buscar ocorrência..." oninput="renderTabela()" />
+    </div>
+  </div>
+
+  <div class="tabela-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:28px;"></th>
+          <th>Nº</th>
+          <th>Tipo de Ocorrência</th>
+          <th>Equipe</th>
+          <th>Status</th>
+          <th>Data / Hora</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-body"></tbody>
+    </table>
+    <div class="sem-resultado" id="sem-resultado" style="display:none;">
+      <span>📭</span>Nenhuma ocorrência encontrada.
+    </div>
+  </div>
+</main>
+
+<footer>
+  CEPLANC Web · Desenvolvimento Front End · ADS 3º Período · ESUDA — Recife, PE
+</footer>
+
+<script src="js/app.js"></script>
+<script>
+  var filtroAtivo = 'TODAS';
+
+  function filtrar(equipe, btn) {
+    filtroAtivo = equipe;
+    document.querySelectorAll('.filtro-btn').forEach(function (b) { b.classList.remove('ativo'); });
+    btn.classList.add('ativo');
+    renderTabela();
+  }
+
+  function renderResumo() {
+    var bar = document.getElementById('resumo-bar');
+    // CORREÇÃO: acessa window.ceplanc.estado que agora aponta para o objeto correto
+    var total = window.ceplanc.estado.historico.length;
+    var html  = '<div class="resumo-item"><strong>' + total + '</strong> Total</div>';
+    window.ceplanc.EQUIPES.forEach(function (nome) {
+      var count = window.ceplanc.estado.historico.filter(function (o) { return o.equipe === nome; }).length;
+      html += '<div class="resumo-item"><strong>' + count + '</strong> ' + nome + '</div>';
+    });
+    bar.innerHTML = html;
+  }
+
+  function renderTabela() {
+    var tbody  = document.getElementById('tabela-body');
+    var semRes = document.getElementById('sem-resultado');
+    var busca  = document.getElementById('busca').value.toLowerCase();
+
+    var lista = window.ceplanc.estado.historico.slice().reverse();
+
+    if (filtroAtivo !== 'TODAS') {
+      lista = lista.filter(function (o) { return o.equipe === filtroAtivo; });
+    }
+    if (busca) {
+      lista = lista.filter(function (o) {
+        return o.tipo.toLowerCase().includes(busca) ||
+               o.equipe.toLowerCase().includes(busca) ||
+               o.id.toLowerCase().includes(busca);
+      });
+    }
+
+    if (lista.length === 0) {
+      tbody.innerHTML = '';
+      semRes.style.display = 'block';
+      return;
+    }
+    semRes.style.display = 'none';
+
+    var html = '';
+    lista.forEach(function (o, idx) {
+      var rid = 'obs-' + idx;
+      var temObs = o.obs && o.obs.trim() !== '';
+      html +=
+        '<tr class="linha-principal" data-obs-id="' + rid + '" onclick="toggleObs(this)">' +
+          '<td class="col-seta">&#9658;</td>' +
+          '<td class="col-id">'     + o.id     + '</td>' +
+          '<td>'                    + o.tipo   + '</td>' +
+          '<td class="col-equipe">' + o.equipe + '</td>' +
+          '<td>'                    + window.badgeEquipeStatus(o.status) + '</td>' +
+          '<td class="col-data">'   + o.data   + '</td>' +
+        '</tr>' +
+        '<tr class="linha-obs">' +
+          '<td colspan="6">' +
+            '<div class="obs-conteudo" id="' + rid + '">' +
+              '<span class="obs-label">Observações</span>' +
+              (temObs
+                ? o.obs
+                : '<span class="obs-vazia">Nenhuma observação registrada para esta ocorrência.</span>') +
+            '</div>' +
+          '</td>' +
+        '</tr>';
+    });
+    tbody.innerHTML = html;
+  }
+
+  function toggleObs(linha) {
+    var rid     = linha.getAttribute('data-obs-id');
+    var painel  = document.getElementById(rid);
+    var aberta  = linha.classList.contains('aberta');
+
+    // Fecha todas as outras
+    document.querySelectorAll('.linha-principal.aberta').forEach(function (l) {
+      l.classList.remove('aberta');
+      var id = l.getAttribute('data-obs-id');
+      document.getElementById(id).classList.remove('visivel');
+    });
+
+    if (!aberta) {
+      linha.classList.add('aberta');
+      painel.classList.add('visivel');
+    }
+  }
+
+  // CORREÇÃO: ouve 'estadoCarregado' para renderizar após o localStorage ser lido
+  window.addEventListener('estadoCarregado', function () {
+    renderResumo();
+    renderTabela();
+  });
+  window.addEventListener('filaAtualizada', function () {
+    renderResumo();
+    renderTabela();
+  });
+</script>
+</body>
+</html>

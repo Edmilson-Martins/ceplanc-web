@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CEPLANC Web — Nova Ocorrência</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .form-wrapper { max-width: 600px; margin: 0 auto; }
+    .form-card {
+      background: var(--fundo-card);
+      border: 1px solid var(--cinza-escuro);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+    }
+    .form-card h2 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--cinza-escuro);
+      color: var(--azul-borda);
+      letter-spacing: 1px;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .btn-row { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+    .btn-row .btn { flex: 1; justify-content: center; }
+    .equipe-auto {
+      background: rgba(57,73,171,0.1);
+      border: 1px solid var(--azul-borda);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    .equipe-auto strong {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #90caf9;
+    }
+    select option { background: #252525; }
+    @media (max-width: 540px) { .form-row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <span class="badge">⚖</span>
+    <span>CEPLANC Web</span>
+  </a>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="index.html">🏠 Fila</a></li>
+    <li><a href="equipes.html">👥 Equipes</a></li>
+    <li><a href="historico.html">📋 Histórico</a></li>
+    <li><a href="nova-ocorrencia.html" class="btn-nova">+ Nova</a></li>
+    <li><a href="sobre.html">ℹ Sobre</a></li>
+  </ul>
+  <span id="relogio"></span>
+</nav>
+
+<div id="toast-container"></div>
+
+<main>
+  <div class="page-header">
+    <h1>📝 Nova Ocorrência</h1>
+    <p>Registre manualmente um novo flagrante no sistema</p>
+  </div>
+
+  <div class="form-wrapper">
+    <div class="form-card">
+      <h2>DADOS DO FLAGRANTE</h2>
+
+      <div class="equipe-auto" id="equipe-auto-info">
+        <span>⚡ Equipe da vez:</span>
+        <strong id="equipe-auto-nome">—</strong>
+        <span id="badge-auto"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="tipo">Tipo de Ocorrência *</label>
+        <select id="tipo" required>
+          <option value="">— Selecione —</option>
+          <option>Flagrante — Roubo a transeúnte</option>
+          <option>Flagrante — Roubo a estabelecimento</option>
+          <option>Flagrante — Tráfico de drogas</option>
+          <option>Flagrante — Furto simples</option>
+          <option>Flagrante — Furto qualificado</option>
+          <option>Porte ilegal de arma</option>
+          <option>Violência doméstica</option>
+          <option>Lesão corporal</option>
+          <option>Homicídio tentado</option>
+          <option>Outro — Especificar abaixo</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="equipe">Equipe responsável *</label>
+          <select id="equipe" required>
+            <option value="">— Selecione —</option>
+            <option>ALFA</option>
+            <option>BRAVO</option>
+            <option>CHARLIE</option>
+            <option>DELTA</option>
+            <option>ECHO</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="status">Status *</label>
+          <select id="status" required>
+            <option value="atendendo">Em Atendimento</option>
+            <option value="andamento">Em Andamento</option>
+            <option value="concluido">Concluído</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="obs">Observações (opcional)</label>
+        <textarea id="obs" placeholder="Descreva detalhes adicionais da ocorrência..."></textarea>
+      </div>
+
+      <div class="btn-row">
+        <a href="index.html" class="btn btn-ghost">← Cancelar</a>
+        <button class="btn btn-success" id="btn-registrar">✔ Registrar Ocorrência</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  CEPLANC Web · Desenvolvimento Front End · ADS 3º Período · ESUDA — Recife, PE
+</footer>
+
+<script src="js/app.js"></script>
+<script>
+  // CORREÇÃO: preencherEquipeAuto lê do window.ceplanc.estado que agora
+  // está sempre atualizado após o 'estadoCarregado'.
+  function preencherEquipeAuto() {
+    var nome = window.getEquipeAtual();
+    document.getElementById('equipe-auto-nome').textContent = nome;
+    document.getElementById('badge-auto').innerHTML = window.badgeEquipeStatus('atendendo');
+
+    var sel = document.getElementById('equipe');
+    for (var i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].text === nome) {
+        sel.selectedIndex = i;
+        break;
+      }
+    }
+  }
+
+  function validar() {
+    var tipo   = document.getElementById('tipo').value;
+    var equipe = document.getElementById('equipe').value;
+    var status = document.getElementById('status').value;
+    if (!tipo)   { window.toast('Selecione o tipo de ocorrencia.', 'erro'); return false; }
+    if (!equipe) { window.toast('Selecione a equipe responsavel.', 'erro'); return false; }
+    if (!status) { window.toast('Selecione o status.', 'erro'); return false; }
+    return true;
+  }
+
+  function registrar() {
+    if (!validar()) return;
+    var tipo   = document.getElementById('tipo').value;
+    var equipe = document.getElementById('equipe').value;
+    var status = document.getElementById('status').value;
+    var obs    = document.getElementById('obs').value;
+    window.registrarOcorrencia(tipo, equipe, status, obs);
+
+    // Limpa o formulário
+    document.getElementById('tipo').value   = '';
+    document.getElementById('status').value = 'atendendo';
+    document.getElementById('obs').value    = '';
+    preencherEquipeAuto();
+
+    setTimeout(function () { window.location.href = 'historico.html'; }, 1500);
+  }
+
+  document.getElementById('btn-registrar').addEventListener('click', registrar);
+
+  // CORREÇÃO: removido listener 'filaAtualizada' que era inútil nesta página
+  // (evento só ocorre na mesma aba; ao navegar entre páginas o estado é
+  //  relido do localStorage via 'estadoCarregado').
+  // Apenas ouvimos 'estadoCarregado' para preencher o campo após o carregamento.
+  window.addEventListener('estadoCarregado', preencherEquipeAuto);
+</script>
+</body>
+</html>

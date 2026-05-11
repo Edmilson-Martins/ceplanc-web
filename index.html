@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CEPLANC Web — Fila de Plantão</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .equipe-destaque {
+      background: linear-gradient(135deg, var(--azul) 0%, var(--azul-claro) 100%);
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 32px rgba(26,35,126,0.5);
+      position: relative;
+      overflow: hidden;
+    }
+    .equipe-destaque::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+    }
+    .equipe-destaque-info small {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      margin-bottom: 6px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .equipe-destaque-info h2 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      line-height: 1;
+    }
+    .equipe-destaque-info .sub {
+      margin-top: 6px;
+      font-size: 13px;
+      opacity: 0.75;
+    }
+    .btn-passar {
+      background: rgba(255,255,255,0.15);
+      border: 2px solid rgba(255,255,255,0.4);
+      color: var(--branco);
+      padding: 14px 28px;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Rajdhani', sans-serif;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: var(--trans);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .btn-passar:hover {
+      background: rgba(255,255,255,0.25);
+      border-color: rgba(255,255,255,0.7);
+      transform: translateY(-2px);
+    }
+    .fila-titulo {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--cinza);
+      margin-bottom: 12px;
+    }
+    .fila-lista { display: flex; flex-direction: column; gap: 8px; }
+    .fila-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      border-radius: var(--radius);
+      border: 1px solid var(--cinza-escuro);
+      background: var(--fundo-card);
+      transition: var(--trans);
+    }
+    .fila-item.ativa {
+      border-color: var(--azul-claro);
+      background: rgba(57,73,171,0.12);
+    }
+    .fila-pos {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      color: var(--cinza);
+      min-width: 24px;
+    }
+    .fila-nome {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      flex: 1;
+    }
+    .fila-item.ativa .fila-nome { color: #90caf9; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 24px;
+    }
+    .stat-card {
+      background: var(--fundo-card);
+      border: 1px solid var(--cinza-escuro);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      text-align: center;
+    }
+    .stat-card .stat-num {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--azul-borda);
+    }
+    .stat-card .stat-label {
+      font-size: 12px;
+      color: var(--cinza);
+      margin-top: 4px;
+    }
+    @media (max-width: 640px) {
+      .grid-2 { grid-template-columns: 1fr 1fr; }
+      .equipe-destaque-info h2 { font-size: 32px; }
+      .btn-passar { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <span class="badge">⚖</span>
+    <span>CEPLANC Web</span>
+  </a>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="index.html">🏠 Fila</a></li>
+    <li><a href="equipes.html">👥 Equipes</a></li>
+    <li><a href="historico.html">📋 Histórico</a></li>
+    <li><a href="nova-ocorrencia.html" class="btn-nova">+ Nova</a></li>
+    <li><a href="sobre.html">ℹ Sobre</a></li>
+  </ul>
+  <span id="relogio"></span>
+</nav>
+
+<div id="toast-container"></div>
+
+<main>
+  <div class="page-header">
+    <h1>⚡ Fila de Plantão</h1>
+    <p>Gestão da escala circular de equipes — Central de Flagrantes · CEPLANC</p>
+  </div>
+
+  <div class="equipe-destaque">
+    <div class="equipe-destaque-info">
+      <small>⚡ Equipe da vez</small>
+      <h2 id="equipe-ativa-nome">—</h2>
+      <p class="sub">Em Atendimento · desde <span id="hora-inicio">--:--</span></p>
+    </div>
+    <button class="btn-passar" id="btn-passar">
+      Passar a Vez &nbsp;→
+    </button>
+  </div>
+
+  <p class="fila-titulo">Ordem da fila circular</p>
+  <div class="fila-lista" id="fila-lista"></div>
+
+  <div class="grid-2">
+    <div class="stat-card">
+      <div class="stat-num" id="total-ocorrencias">0</div>
+      <div class="stat-label">Ocorrências registradas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">5</div>
+      <div class="stat-label">Equipes em plantão</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  CEPLANC Web · Desenvolvimento Front End · ADS 3º Período · ESUDA — Recife, PE
+</footer>
+
+<script src="js/app.js"></script>
+<script>
+  function renderFila() {
+    const lista    = document.getElementById('fila-lista');
+    const nomeEl   = document.getElementById('equipe-ativa-nome');
+    const horaEl   = document.getElementById('hora-inicio');
+    const totalEl  = document.getElementById('total-ocorrencias');
+    if (!lista) return;
+
+    lista.innerHTML = '';
+
+    for (var i = 0; i < window.ceplanc.EQUIPES.length; i++) {
+      var idx       = (window.ceplanc.estado.filaAtual + i) % window.ceplanc.EQUIPES.length;
+      var nome      = window.ceplanc.EQUIPES[idx];
+      var pos       = i + 1;
+      var statusKey = (i === 0) ? 'atendendo' : 'aguardando';
+
+      var div = document.createElement('div');
+      div.className = 'fila-item' + (i === 0 ? ' ativa' : '');
+      div.innerHTML =
+        '<span class="fila-pos">' + pos + 'º</span>' +
+        '<span class="fila-nome">' + nome + '</span>' +
+        window.badgeEquipeStatus(statusKey);
+      lista.appendChild(div);
+    }
+
+    nomeEl.textContent  = window.getEquipeAtual();
+    horaEl.textContent  = window.ceplanc.estado.horaInicio || '--:--';
+    totalEl.textContent = window.ceplanc.estado.historico.length;
+  }
+
+  // CORREÇÃO: ouve 'estadoCarregado' (disparado pelo app.js após carregarEstado)
+  // garante que o render acontece DEPOIS que o localStorage foi lido.
+  window.addEventListener('estadoCarregado', renderFila);
+  window.addEventListener('filaAtualizada',  renderFila);
+
+  document.getElementById('btn-passar').addEventListener('click', function () {
+    window.passarVez();
+    // renderFila já é chamado via evento 'filaAtualizada'
+  });
+</script>
+</body>
+</html>

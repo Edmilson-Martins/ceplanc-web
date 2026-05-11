@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CEPLANC Web — Equipes</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .equipes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 18px;
+    }
+    .equipe-card {
+      background: var(--fundo-card);
+      border: 1px solid var(--cinza-escuro);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: var(--trans);
+    }
+    .equipe-card:hover { border-color: var(--azul-borda); transform: translateY(-2px); }
+    .equipe-card.da-vez {
+      border-color: var(--azul-claro);
+      box-shadow: 0 0 0 2px rgba(57,73,171,0.3);
+    }
+    .equipe-header {
+      background: var(--azul);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .equipe-header h3 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+    .equipe-pos-badge {
+      background: rgba(255,255,255,0.15);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .equipe-body { padding: 18px 20px; }
+    .equipe-stat {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--cinza-escuro);
+      font-size: 13px;
+    }
+    .equipe-stat:last-child { border-bottom: none; }
+    .equipe-stat .label { color: var(--cinza); }
+    .equipe-stat .valor { font-weight: 600; font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
+    .da-vez-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--verde);
+      font-weight: 600;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--verde);
+      animation: pulsar 1s infinite;
+    }
+    @keyframes pulsar {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.5; transform: scale(0.8); }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <span class="badge">⚖</span>
+    <span>CEPLANC Web</span>
+  </a>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="index.html">🏠 Fila</a></li>
+    <li><a href="equipes.html">👥 Equipes</a></li>
+    <li><a href="historico.html">📋 Histórico</a></li>
+    <li><a href="nova-ocorrencia.html" class="btn-nova">+ Nova</a></li>
+    <li><a href="sobre.html">ℹ Sobre</a></li>
+  </ul>
+  <span id="relogio"></span>
+</nav>
+
+<div id="toast-container"></div>
+
+<main>
+  <div class="page-header">
+    <h1>👥 Equipes de Plantão</h1>
+    <p>Status detalhado das 5 equipes da CEPLANC em tempo real</p>
+  </div>
+  <div class="equipes-grid" id="equipes-grid"></div>
+</main>
+
+<footer>
+  CEPLANC Web · Desenvolvimento Front End · ADS 3º Período · ESUDA — Recife, PE
+</footer>
+
+<script src="js/app.js"></script>
+<script>
+  function contarPorEquipe(nome) {
+    return window.ceplanc.estado.historico.filter(function (o) { return o.equipe === nome; }).length;
+  }
+
+  function posicaoNaFila(nome) {
+    var idx = window.ceplanc.EQUIPES.indexOf(nome);
+    return ((idx - window.ceplanc.estado.filaAtual + window.ceplanc.EQUIPES.length) % window.ceplanc.EQUIPES.length) + 1;
+  }
+
+  // CORREÇÃO: getStatusEquipe agora retorna 'ocorrencia' para CHARLIE quando não é a vez dela,
+  // refletindo o status real informado na documentação do projeto.
+  function getStatusEquipe(nome) {
+    if (nome === window.getEquipeAtual()) return 'atendendo';
+    if (nome === 'CHARLIE')               return 'ocorrencia';
+    return 'aguardando';
+  }
+
+  function renderEquipes() {
+    var grid = document.getElementById('equipes-grid');
+    grid.innerHTML = '';
+
+    window.ceplanc.EQUIPES.forEach(function (nome) {
+      var eDaVez     = nome === window.getEquipeAtual();
+      var pos        = posicaoNaFila(nome);
+      var statusKey  = getStatusEquipe(nome);
+      var ocorrencias = contarPorEquipe(nome);
+
+      var card = document.createElement('div');
+      card.className = 'equipe-card' + (eDaVez ? ' da-vez' : '');
+      card.innerHTML =
+        '<div class="equipe-header">' +
+          '<h3>' + nome + '</h3>' +
+          '<span class="equipe-pos-badge">' + pos + 'º na fila</span>' +
+        '</div>' +
+        '<div class="equipe-body">' +
+          '<div class="equipe-stat"><span class="label">Status</span><span>' + window.badgeEquipeStatus(statusKey) + '</span></div>' +
+          '<div class="equipe-stat"><span class="label">Ocorrências atendidas</span><span class="valor">' + ocorrencias + '</span></div>' +
+          '<div class="equipe-stat"><span class="label">Posição na fila</span><span class="valor">' + pos + 'º</span></div>' +
+          (eDaVez ? '<div class="da-vez-label"><span class="dot"></span> Equipe em atendimento agora</div>' : '') +
+        '</div>';
+      grid.appendChild(card);
+    });
+  }
+
+  // CORREÇÃO: ouve 'estadoCarregado' para renderizar após o localStorage ser lido
+  window.addEventListener('estadoCarregado', renderEquipes);
+  window.addEventListener('filaAtualizada',  renderEquipes);
+</script>
+</body>
+</html>
