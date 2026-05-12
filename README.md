@@ -32,16 +32,18 @@ A CEPLANC opera com 5 equipes (ALFA, BRAVO, CHARLIE, DELTA e ECHO) que se reveza
 
 ## Estrutura
 
+```text
 ceplanc-web/
-├── index.html          # Fila de plantão (página inicial)
-├── equipes.html        # Status detalhado das equipes
-├── historico.html      # Histórico de ocorrências
-├── nova-ocorrencia.html # Registro de novo flagrante
-├── sobre.html          # Sobre o projeto e a equipe
+├── index.html           # Fila de plantão (página inicial)
+├── equipes.html         # Status detalhado das equipes
+├── historico.html       # Histórico de ocorrências
+├── nova-ocorrencia.html  # Registro de novo flagrante
+├── sobre.html           # Sobre o projeto e a equipe
 ├── css/
 │   └── style.css
 └── js/
     └── app.js
+```
     
 # Equipe
 
