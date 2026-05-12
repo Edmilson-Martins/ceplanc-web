@@ -143,8 +143,6 @@
 
 <script src="js/app.js"></script>
 <script>
-  // CORREÇÃO: preencherEquipeAuto lê do window.ceplanc.estado que agora
-  // está sempre atualizado após o 'estadoCarregado'.
   function preencherEquipeAuto() {
     var nome = window.getEquipeAtual();
     document.getElementById('equipe-auto-nome').textContent = nome;
@@ -177,7 +175,6 @@
     var obs    = document.getElementById('obs').value;
     window.registrarOcorrencia(tipo, equipe, status, obs);
 
-    // Limpa o formulário
     document.getElementById('tipo').value   = '';
     document.getElementById('status').value = 'atendendo';
     document.getElementById('obs').value    = '';
@@ -187,11 +184,6 @@
   }
 
   document.getElementById('btn-registrar').addEventListener('click', registrar);
-
-  // CORREÇÃO: removido listener 'filaAtualizada' que era inútil nesta página
-  // (evento só ocorre na mesma aba; ao navegar entre páginas o estado é
-  //  relido do localStorage via 'estadoCarregado').
-  // Apenas ouvimos 'estadoCarregado' para preencher o campo após o carregamento.
   window.addEventListener('estadoCarregado', preencherEquipeAuto);
 </script>
 </body>

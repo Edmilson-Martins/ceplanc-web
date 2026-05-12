@@ -1,17 +1,5 @@
-/* ============================================================
-   CEPLANC Web — app.js (versão corrigida)
-   CORREÇÕES:
-   - Estado nunca é reatribuído (spread evitado), mantendo referência
-   - window.ceplanc montado APÓS carregarEstado(), dentro do DOMContentLoaded
-   - Funções globais expostas antes do DOMContentLoaded para uso imediato
-   ============================================================ */
-
-// ── CONSTANTES ─────────────────────────────────────────────
 const EQUIPES = ['ALFA', 'BRAVO', 'CHARLIE', 'DELTA', 'ECHO'];
 
-// ── ESTADO GLOBAL ───────────────────────────────────────────
-// CORREÇÃO: nunca reatribuir `estado` com `estado = { ... }`.
-// Sempre mute o mesmo objeto para manter referências válidas.
 const estado = {
   filaAtual:   0,
   historico:   [],
@@ -19,7 +7,6 @@ const estado = {
   horaInicio:  null,
 };
 
-// ── PERSISTÊNCIA ────────────────────────────────────────────
 function salvarEstado() {
   localStorage.setItem('ceplanc_estado', JSON.stringify(estado));
 }
@@ -29,8 +16,6 @@ function carregarEstado() {
   if (salvo) {
     try {
       const parsed = JSON.parse(salvo);
-      // CORREÇÃO: em vez de reatribuir `estado = {...}`, mutamos o objeto existente
-      // para que todas as referências (window.ceplanc.estado, etc.) permaneçam válidas.
       Object.assign(estado, parsed);
     } catch (e) {
       console.warn('Erro ao carregar estado:', e);
@@ -55,7 +40,6 @@ function carregarEstado() {
   salvarEstado();
 }
 
-// ── FILA ────────────────────────────────────────────────────
 function getEquipeAtual() {
   return EQUIPES[estado.filaAtual];
 }
@@ -70,7 +54,6 @@ function passarVez() {
   return getEquipeAtual();
 }
 
-// ── OCORRÊNCIAS ─────────────────────────────────────────────
 function proximoId() {
   estado.contadorOco += 1;
   salvarEstado();
@@ -93,7 +76,6 @@ function registrarOcorrencia(tipo, equipe, status, obs) {
   return nova;
 }
 
-// ── UTILITÁRIOS ─────────────────────────────────────────────
 function agora() {
   const d = new Date();
   return d.toLocaleDateString('pt-BR') + ' ' +
@@ -126,7 +108,6 @@ function badgeEquipeStatus(status) {
   return '<span class="' + entry[0] + '">' + entry[1] + '</span>';
 }
 
-// ── RELÓGIO ─────────────────────────────────────────────────
 function iniciarRelogio() {
   const el = document.getElementById('relogio');
   if (!el) return;
@@ -139,7 +120,6 @@ function iniciarRelogio() {
   setInterval(atualiza, 1000);
 }
 
-// ── NAVEGAÇÃO ───────────────────────────────────────────────
 function iniciarNav() {
   const pagina = window.location.pathname.split('/').pop() || 'index.html';
   document.querySelectorAll('.nav-links a').forEach(function (a) {
@@ -160,10 +140,6 @@ function iniciarNav() {
   }
 }
 
-// ── EXPOSIÇÃO GLOBAL ────────────────────────────────────────
-// Funções expostas ANTES do DOMContentLoaded para uso imediato nos HTMLs.
-// window.ceplanc.estado aponta para o MESMO objeto `estado` (referência direta),
-// garantindo que qualquer mutação feita internamente seja visível externamente.
 window.getEquipeAtual      = getEquipeAtual;
 window.passarVez           = passarVez;
 window.registrarOcorrencia = registrarOcorrencia;
@@ -180,13 +156,9 @@ window.ceplanc = {
   toast:               toast,
 };
 
-// ── INIT ────────────────────────────────────────────────────
-// carregarEstado() chamado dentro do DOMContentLoaded para garantir
-// que o DOM exista e que o estado seja populado antes de qualquer render.
 document.addEventListener('DOMContentLoaded', function () {
   carregarEstado();
   iniciarNav();
   iniciarRelogio();
-  // Sinaliza que o estado foi carregado — páginas ouvem este evento para renderizar
   window.dispatchEvent(new CustomEvent('estadoCarregado'));
 });

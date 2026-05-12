@@ -228,14 +228,11 @@
     totalEl.textContent = window.ceplanc.estado.historico.length;
   }
 
-  // CORREÇÃO: ouve 'estadoCarregado' (disparado pelo app.js após carregarEstado)
-  // garante que o render acontece DEPOIS que o localStorage foi lido.
   window.addEventListener('estadoCarregado', renderFila);
   window.addEventListener('filaAtualizada',  renderFila);
 
   document.getElementById('btn-passar').addEventListener('click', function () {
     window.passarVez();
-    // renderFila já é chamado via evento 'filaAtualizada'
   });
 </script>
 </body>

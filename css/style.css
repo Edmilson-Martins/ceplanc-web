@@ -1,8 +1,3 @@
-/* ============================================================
-   CEPLANC Web — Folha de Estilos Principal
-   Paleta: Azul escuro #1A237E | Fundo #1E1E1E | Texto #FFFFFF
-   ============================================================ */
-
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@300;400;500;600&display=swap');
 
 :root {
@@ -43,7 +38,6 @@ body {
   flex-direction: column;
 }
 
-/* ── NAV ── */
 nav {
   background: var(--azul);
   padding: 0 24px;
@@ -117,7 +111,6 @@ nav {
   background: #69f0ae;
 }
 
-/* hamburger mobile */
 .hamburger {
   display: none;
   flex-direction: column;
@@ -136,7 +129,6 @@ nav {
   transition: var(--trans);
 }
 
-/* ── MAIN ── */
 main {
   flex: 1;
   padding: 32px 24px;
@@ -145,7 +137,6 @@ main {
   width: 100%;
 }
 
-/* ── FOOTER ── */
 footer {
   background: #111;
   border-top: 1px solid var(--cinza-escuro);
@@ -156,7 +147,6 @@ footer {
   font-family: 'IBM Plex Mono', monospace;
 }
 
-/* ── CARDS ── */
 .card {
   background: var(--fundo-card);
   border: 1px solid var(--cinza-escuro);
@@ -167,7 +157,6 @@ footer {
 }
 .card:hover { border-color: var(--azul-borda); }
 
-/* ── BADGES DE STATUS ── */
 .badge-status {
   display: inline-block;
   padding: 3px 10px;
@@ -183,7 +172,6 @@ footer {
 .badge-concluido  { background: rgba(176,176,176,0.1); color: var(--cinza); border: 1px solid var(--cinza-escuro); }
 .badge-andamento  { background: rgba(57,73,171,0.2); color: #90caf9; border: 1px solid var(--azul-claro); }
 
-/* ── BOTÕES ── */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -223,7 +211,6 @@ footer {
 }
 .btn-ghost:hover { background: var(--fundo-hover); color: var(--branco); }
 
-/* ── INPUTS ── */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -257,7 +244,6 @@ footer {
 }
 .form-group textarea { resize: vertical; min-height: 90px; }
 
-/* ── TABELA ── */
 .tabela-wrapper { overflow-x: auto; }
 table {
   width: 100%;
@@ -286,7 +272,6 @@ tbody td {
   vertical-align: middle;
 }
 
-/* ── PAGE HEADER ── */
 .page-header {
   margin-bottom: 28px;
 }
@@ -302,7 +287,6 @@ tbody td {
   margin-top: 4px;
 }
 
-/* ── TOAST ── */
 #toast-container {
   position: fixed;
   bottom: 24px;
@@ -332,7 +316,6 @@ tbody td {
   to { opacity: 0; transform: translateY(10px); }
 }
 
-/* ── FILTROS ── */
 .filtros {
   display: flex;
   gap: 8px;
@@ -357,14 +340,12 @@ tbody td {
   border-color: var(--azul-claro);
 }
 
-/* ── RELOGIO ── */
 #relogio {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 13px;
   color: rgba(255,255,255,0.6);
 }
 
-/* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   main { padding: 20px 16px; }
 

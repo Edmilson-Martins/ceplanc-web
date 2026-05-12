@@ -12,8 +12,6 @@
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 12px;
-      /* CORREÇÃO: removido margin-bottom daqui — os filtros já têm o próprio
-         margin-bottom via .filtros no CSS global, evitando espaço duplo. */
     }
     .busca-wrapper { position: relative; }
     .busca-wrapper input {
@@ -69,7 +67,6 @@
     }
     .resumo-item strong { font-family: 'Rajdhani', sans-serif; font-size: 18px; }
 
-    /* ── Accordion ── */
     tbody tr.linha-principal { cursor: pointer; }
     tbody tr.linha-principal:hover td { background: var(--fundo-hover); }
     tbody tr.linha-principal.aberta td { background: rgba(57,73,171,0.08); }
@@ -197,7 +194,6 @@
 
   function renderResumo() {
     var bar = document.getElementById('resumo-bar');
-    // CORREÇÃO: acessa window.ceplanc.estado que agora aponta para o objeto correto
     var total = window.ceplanc.estado.historico.length;
     var html  = '<div class="resumo-item"><strong>' + total + '</strong> Total</div>';
     window.ceplanc.EQUIPES.forEach(function (nome) {
@@ -264,7 +260,6 @@
     var painel  = document.getElementById(rid);
     var aberta  = linha.classList.contains('aberta');
 
-    // Fecha todas as outras
     document.querySelectorAll('.linha-principal.aberta').forEach(function (l) {
       l.classList.remove('aberta');
       var id = l.getAttribute('data-obs-id');
@@ -277,7 +272,6 @@
     }
   }
 
-  // CORREÇÃO: ouve 'estadoCarregado' para renderizar após o localStorage ser lido
   window.addEventListener('estadoCarregado', function () {
     renderResumo();
     renderTabela();

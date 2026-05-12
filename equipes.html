@@ -121,8 +121,6 @@
     return ((idx - window.ceplanc.estado.filaAtual + window.ceplanc.EQUIPES.length) % window.ceplanc.EQUIPES.length) + 1;
   }
 
-  // CORREÇÃO: getStatusEquipe agora retorna 'ocorrencia' para CHARLIE quando não é a vez dela,
-  // refletindo o status real informado na documentação do projeto.
   function getStatusEquipe(nome) {
     if (nome === window.getEquipeAtual()) return 'atendendo';
     if (nome === 'CHARLIE')               return 'ocorrencia';
@@ -156,7 +154,6 @@
     });
   }
 
-  // CORREÇÃO: ouve 'estadoCarregado' para renderizar após o localStorage ser lido
   window.addEventListener('estadoCarregado', renderEquipes);
   window.addEventListener('filaAtualizada',  renderEquipes);
 </script>
