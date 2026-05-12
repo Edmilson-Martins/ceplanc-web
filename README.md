@@ -33,24 +33,23 @@ A CEPLANC opera com 5 equipes (ALFA, BRAVO, CHARLIE, DELTA e ECHO) que se reveza
 ## Estrutura
 
 ceplanc-web/
-├── index.html            # Fila de plantão (página inicial)
-├── equipes.html          # Status detalhado das equipes
-├── historico.html        # Histórico de ocorrências
-├── nova-ocorrencia.html  # Registro de novo flagrante
-├── sobre.html            # Sobre o projeto e a equipe
+├── index.html          # Fila de plantão (página inicial)
+├── equipes.html        # Status detalhado das equipes
+├── historico.html      # Histórico de ocorrências
+├── nova-ocorrencia.html # Registro de novo flagrante
+├── sobre.html          # Sobre o projeto e a equipe
 ├── css/
 │   └── style.css
 └── js/
     └── app.js
-
+    
 # Equipe
 
-José Edmilson (líder) – HTML e integração
-Thomás Cauã – CSS e responsividade
-Mateus Willis – JavaScript e lógica da fila
-Michel Maciel – Wireframes e testes
-Fabiano – Testes e documentação
-
+* **José Edmilson (líder)** – HTML e integração
+* **Thomás Cauã** – CSS e responsividade
+* **Mateus Willis** – JavaScript e lógica da fila
+* **Michel Maciel** – Wireframes e testes
+* **Fabiano** – Testes e documentação
 ---
 
 ESUDA — Recife, PE · ADS 3º Período · 2026
